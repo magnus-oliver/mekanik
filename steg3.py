@@ -8,7 +8,7 @@ xpos = 0
 ypos = 0
 
 initialvelocity = 50
-angle = 30
+angle = 15
 
 xspeed = 0
 yspeed = 0
@@ -17,7 +17,7 @@ g = -9.81
 timeinair = 0
 ballmass = 46e-3
 gforce = ballmass*g
-windspeed = -5
+windspeed = 0
 airdensity = 1.225
 dragkoefficient = 0.25
 area = 1430e-6
@@ -25,6 +25,8 @@ area = 1430e-6
 k = 1000
 c = 2
 my = 0.15
+
+xhal = 190
 
 anglerad = math.radians(angle)
 xspeed = math.cos(anglerad)*initialvelocity
@@ -72,14 +74,13 @@ def forcecalc(t, u):
 
 solution = i.solve_ivp(
     fun=forcecalc,
-    t_span = [0,10],
+    t_span = [0,20],
     y0=u0,
     max_step=0.1
 )
 
 x_positions = solution.y[0]
 y_positions = solution.y[1]
-
 
 # test för del 1 i steg 2
 # print(f"x-positions = {x_positions} \n y-positions = {y_positions}")
@@ -92,3 +93,4 @@ plt.ylabel('Vertikal höjd (m)')
 plt.grid(True)
 plt.savefig("steg2-graf.png")
 plt.show()
+print(x_positions[-1])
