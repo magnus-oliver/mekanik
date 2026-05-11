@@ -7,7 +7,7 @@ t = 0
 xpos = 0
 ypos = 0
 
-initialvelocity = 50
+initialvelocity = 60
 angle = 15
 
 xspeed = 0
@@ -17,7 +17,7 @@ g = -9.81
 timeinair = 0
 ballmass = 46e-3
 gforce = ballmass*g
-windspeed = 0
+windspeed = -5
 airdensity = 1.225
 dragkoefficient = 0.25
 area = 1430e-6
@@ -84,6 +84,14 @@ y_positions = solution.y[1]
 
 # test för del 1 i steg 2
 # print(f"x-positions = {x_positions} \n y-positions = {y_positions}")
+
+def ballstopp(t, u):
+    xpos, ypos, xspeed, yspeed = u
+    # Returnerar 0 när xspeed är 0.01. Då triggas eventet.
+    return xspeed - 0.01 
+
+ballstopp.terminal = True  # Avbryt simuleringen när detta händer
+ballstopp.direction = -1   # Triggas när hastigheten minskar och passerar värdet
 
 plt.figure()
 plt.plot(x_positions, y_positions)
