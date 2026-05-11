@@ -37,9 +37,6 @@ u = [xpos, ypos, xspeed, yspeed]
 
 def balltrajectory():
     x, y, xspeed, yspeed = u
-    if ypos < 0: # ta bort senare
-        xspeed = 0
-        yspeed = 0
     
     xpos = ((initialvelocity**2)*math.sin(2*anglerad))/-g
     timeinair = xpos/xspeed
