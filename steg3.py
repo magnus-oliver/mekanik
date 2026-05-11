@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as i
 
@@ -82,13 +83,46 @@ y_positions = solution.y[1]
 # test för del 1 i steg 2
 # print(f"x-positions = {x_positions} \n y-positions = {y_positions}")
 
-def ballstopp(t, u):
+def ballstop(t, u):
     xpos, ypos, xspeed, yspeed = u
     # Returnerar 0 när xspeed är 0.01. Då triggas eventet.
     return xspeed - 0.01 
 
-ballstopp.terminal = True  # Avbryt simuleringen när detta händer
-ballstopp.direction = -1   # Triggas när hastigheten minskar och passerar värdet
+ballstop.terminal = True  # Avbryt simuleringen när detta händer
+ballstop.direction = -1   # Triggas när hastigheten minskar och passerar värdet
+
+anglelist = []
+
+def optimalangle():
+    for n in range(0,180):
+        angle = n / 2 # Ger 0.0, 0.5, 1.0 ... upp till 89.5 grader
+        
+        # 1. Räkna ut nya starthastigheter för just denna vinkel!
+        anglerad = math.radians(angle)
+        start_xspeed = math.cos(anglerad) * initialvelocity
+        start_yspeed = math.sin(anglerad) * initialvelocity
+        
+        current_u0 = [0, 0, start_xspeed, start_yspeed]
+
+        solution = i.solve_ivp(
+            fun=forcecalc,
+            t_span=[0, 20],
+            y0=current_u0,
+            events=ballstop,
+            max_step=0.1
+        )
+
+        x_positions = solution.y[0]
+        final_x = x_positions[-1]
+
+        anglelist.append([final_x, angle])
+    
+    best_result = max(anglelist)
+    
+    print(f"Längsta slaget: {best_result[0]:.2f} m vid vinkeln {best_result[1]} grader")
+
+# Kör funktionen
+optimalangle()
 
 plt.figure()
 plt.plot(x_positions, y_positions)
@@ -98,4 +132,3 @@ plt.ylabel('Vertikal höjd (m)')
 plt.grid(True)
 plt.savefig("steg2-graf.png")
 plt.show()
-print(x_positions[-1])
