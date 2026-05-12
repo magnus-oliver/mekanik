@@ -31,8 +31,6 @@ def balltrajectory():
     print(f"xspeed: {xspeed}, yspeed: {yspeed}, xpos: {xpos}, timeinair: {timeinair}")
     return timeinair, xspeed, yspeed
 
-balltrajectory()
-
 # Hämta data för simuleringen
 time_limit, vx, vy = balltrajectory()
 
