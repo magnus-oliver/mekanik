@@ -36,11 +36,6 @@ yspeed = math.sin(anglerad)*initialvelocity
 u0 = [0, 0, xspeed, yspeed]
 u = [xpos, ypos, xspeed, yspeed]
 
-velocity_final = 0
-angle_final = 0
-x_final = 0
-vx_final = 0
-
 def balltrajectory():
     x, y, xspeed, yspeed = u
     
@@ -125,16 +120,13 @@ def optimalangle():
 
 def find_hole_in_one():
     vhalmax = 0.2
-    
-    for velocity_test in range(40, 70): 
+    for velocity_test in range(40, 75): 
         for angle_test in range(10, 45):
-            
             test_rad = math.radians(angle_test)
             v0_x = math.cos(test_rad) * velocity_test
             v0_y = math.sin(test_rad) * velocity_test
             u_test = [0, 0, v0_x, v0_y]
 
-            # simuleringen
             sol = i.solve_ivp(
                 fun=forcecalc,
                 t_span=[0, 20],
@@ -143,37 +135,46 @@ def find_hole_in_one():
                 max_step=0.1
             )
 
-            # hämta slutposition och hastighet
             final_x = sol.y[0][-1]
-            x_final = final_x
             final_vx = sol.y[2][-1]
-            vx_final = final_vx
 
-            # returnera första fungerande hål-i-ett
             if abs(final_x - xhal) < 0.02 and final_vx < vhalmax:
-                print("--- HOLE IN ONE HITTAD! ---")
-                print(f"Utslagshastighet: {velocity_test} m/s")
-                velocity_final = velocity_test
-                print(f"Vinkel: {angle_test} grader")
-                angle_final = angle_test
-                print(f"Slutposition: {final_x:.2f} m")
-                print(f"Sluthastighet: {final_vx:.3f} m/s")
-                return velocity_test, angle_test, sol # Returnerar lösningen för plottning
-
-    print("Hole-in-one saknas")
+                return {
+                    'velocity': velocity_test,
+                    'angle': angle_test,
+                    'pos': final_x,
+                    'speed': final_vx,
+                    'sol': sol
+                }
     return None
 
 result = find_hole_in_one()
+
 if result:
-    v0_opt, angle_opt, hole_sol = result
-    plt.figure()
-    plt.plot(hole_sol.y[0], hole_sol.y[1], 'b-', label='Hole-in-one bana')
-    plt.plot(xhal, 0, 'x', label='Hålet (190m)', color='green')
-    plt.text(125, 15, f"Hole-in-one-parametrar:\nUtslagshastighet: {velocity_final} m/s\nUtslagsvinkel: {angle_final} grader\nSlutposition: {x_final} m\nSluthastighet: {vx_final}", bbox=(dict(boxstyle='round', facecolor='wheat', alpha=0.5)))
-    plt.title(f'Hole-in-one: {v0_opt}m/s vid {angle_opt} grader')
+    res_sol = result['sol']
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(res_sol.y[0], res_sol.y[1], 'b-', label='Hole-in-one bana')
+    plt.plot(xhal, 0, 'gx', markersize=10, label='Hålet (190m)') # Grön cirkel för hålet
+    
+    info_text = (
+        f"--- Resultat ---\n"
+        f"Utslagshastighet: {result['velocity']} m/s\n"
+        f"Utslagsvinkel: {result['angle']}°\n"
+        f"Slutposition: {result['pos']:.2f} m\n"
+        f"Sluthastighet: {result['speed']:.3f} m/s"
+    )
+    
+    plt.text(0.05, 0.95, info_text, transform=plt.gca().transAxes, 
+             fontsize=10, verticalalignment='top', 
+             bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    
+    plt.title(f"Hole-in-one på {xhal}m (med {abs(windspeed)}m/s motvind)")
     plt.xlabel('Horisontellt avstånd (m)')
     plt.ylabel('Vertikal höjd (m)')
-    plt.legend()
-    plt.grid(True)
+    plt.legend(loc='upper right')
+    plt.grid(True, linestyle='--', alpha=0.7)
     plt.savefig("steg4-graf.png")
     plt.show()
+else:
+    print("Ingen lösning hittades. Prova att öka intervallet för velocity_test.")
