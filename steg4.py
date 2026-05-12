@@ -154,7 +154,6 @@ def find_hole_in_one():
     print("Hittade ingen hole-in-one med nuvarande intervall.")
     return None
 
-# Kör sökningen och plotta resultatet
 result = find_hole_in_one()
 if result:
     v0_opt, angle_opt, hole_sol = result
