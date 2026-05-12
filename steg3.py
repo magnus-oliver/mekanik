@@ -43,7 +43,7 @@ def optimalangle():
     best_sol = None
     best_angle = 0
     
-    for n in range(0, 181):
+    for n in range(0, 180):
         angle = n / 2 
         anglerad = math.radians(angle)
         u0 = [0, 0, math.cos(anglerad)*initialvelocity, math.sin(anglerad)*initialvelocity]

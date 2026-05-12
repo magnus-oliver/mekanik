@@ -82,7 +82,6 @@ y_positions = solution.y[1]
 
 def ballstop(t, u):
     xpos, ypos, xspeed, yspeed = u
-    # Returnerar 0 när xspeed är 0.01. Då triggas eventet.
     return xspeed - 0.01 
 
 ballstop.terminal = True  # Avbryt simuleringen när detta händer

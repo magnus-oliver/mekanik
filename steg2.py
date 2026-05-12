@@ -80,10 +80,6 @@ solution = i.solve_ivp(
 x_positions = solution.y[0]
 y_positions = solution.y[1]
 
-
-# test för del 1 i steg 2
-# print(f"x-positions = {x_positions} \n y-positions = {y_positions}")
-
 plt.figure()
 plt.plot(x_positions, y_positions)
 plt.title('Golfbollens bana')
