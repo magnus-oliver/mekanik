@@ -15,7 +15,6 @@ g = -9.82
 timeinair = 0
 
 def balltrajectory():
-    global xspeed, yspeed, initialvelocity, angle, g
 
     anglerad = math.radians(angle)
     
@@ -37,12 +36,8 @@ balltrajectory()
 # Hämta data för simuleringen
 time_limit, vx, vy = balltrajectory()
 
-# Skapa en tidsaxel från 0 till landning (100 punkter för en jämn kurva)
 t_values = np.linspace(0, time_limit, 100)
 
-# Beräkna x och y för varje tidspunkt
-# x = v_x * t
-# y = v_y * t + 0.5 * g * t^2
 x_points = vx * t_values
 y_points = vy * t_values + 0.5 * g * t_values**2
 
