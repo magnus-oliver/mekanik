@@ -6,7 +6,7 @@ xpos = 0
 ypos = 0
 
 initialvelocity = 50
-angle = 30
+angle = 15
 
 xspeed = 0
 yspeed = 0
