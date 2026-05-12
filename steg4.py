@@ -36,6 +36,11 @@ yspeed = math.sin(anglerad)*initialvelocity
 u0 = [0, 0, xspeed, yspeed]
 u = [xpos, ypos, xspeed, yspeed]
 
+velocity_final = 0
+angle_final = 0
+x_final = 0
+vx_final = 0
+
 def balltrajectory():
     x, y, xspeed, yspeed = u
     
@@ -140,18 +145,22 @@ def find_hole_in_one():
 
             # hämta slutposition och hastighet
             final_x = sol.y[0][-1]
+            x_final = final_x
             final_vx = sol.y[2][-1]
+            vx_final = final_vx
 
-            # Om vi är nära hålet (190m) och bollen rullar tillräckligt sakta  
+            # returnera första fungerande hål-i-ett
             if abs(final_x - xhal) < 0.02 and final_vx < vhalmax:
                 print("--- HOLE IN ONE HITTAD! ---")
-                print(f"Utgångshastighet: {velocity_test} m/s")
+                print(f"Utslagshastighet: {velocity_test} m/s")
+                velocity_final = velocity_test
                 print(f"Vinkel: {angle_test} grader")
+                angle_final = angle_test
                 print(f"Slutposition: {final_x:.2f} m")
                 print(f"Sluthastighet: {final_vx:.3f} m/s")
                 return velocity_test, angle_test, sol # Returnerar lösningen för plottning
 
-    print("Hittade ingen hole-in-one med nuvarande intervall.")
+    print("Hole-in-one saknas")
     return None
 
 result = find_hole_in_one()
@@ -160,6 +169,7 @@ if result:
     plt.figure()
     plt.plot(hole_sol.y[0], hole_sol.y[1], 'b-', label='Hole-in-one bana')
     plt.plot(xhal, 0, 'x', label='Hålet (190m)', color='green')
+    plt.text(125, 15, f"Hole-in-one-parametrar:\nUtslagshastighet: {velocity_final} m/s\nUtslagsvinkel: {angle_final} grader\nSlutposition: {x_final} m\nSluthastighet: {vx_final}", bbox=(dict(boxstyle='round', facecolor='wheat', alpha=0.5)))
     plt.title(f'Hole-in-one: {v0_opt}m/s vid {angle_opt} grader')
     plt.xlabel('Horisontellt avstånd (m)')
     plt.ylabel('Vertikal höjd (m)')
