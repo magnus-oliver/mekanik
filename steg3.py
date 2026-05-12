@@ -3,127 +3,90 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as i
 
-t = 0
-
-xpos = 0
-ypos = 0
-
-initialvelocity = 50
-angle = 15
-
-xspeed = 0
-yspeed = 0
-
 g = -9.81
-timeinair = 0
 ballmass = 46e-3
-gforce = ballmass*g
-windspeed = 0
+windspeed = 0  
 airdensity = 1.225
 dragkoefficient = 0.25
 area = 1430e-6
-
 k = 1000
 c = 2
 my = 0.15
-
-xhal = 190
-
-anglerad = math.radians(angle)
-xspeed = math.cos(anglerad)*initialvelocity
-yspeed = math.sin(anglerad)*initialvelocity
-
-u0 = [0, 0, xspeed, yspeed]
-u = [xpos, ypos, xspeed, yspeed]
-
-def balltrajectory():
-    x, y, xspeed, yspeed = u
-    
-    xpos = ((initialvelocity**2)*math.sin(2*anglerad))/-g
-    timeinair = xpos/xspeed
-    return u
-
-balltrajectory()
+initialvelocity = 50
 
 def forcecalc(t, u):
     xpos, ypos, xspeed, yspeed = u
-
     if ypos > 0:
         vrelx = xspeed - windspeed
         vrely = yspeed
-        vrel = math.sqrt(vrelx**2+vrely**2)
-
-        df = airdensity * dragkoefficient * area * abs(vrel)**2 * 1/2
-
-        forcex = -df*vrelx/vrel
-        forcey = -df*vrely/vrel
-
-        accx = forcex/ballmass
-        accy = forcey/ballmass + g
-    
+        vrel = math.sqrt(vrelx**2 + vrely**2)
+        df = 0.5 * airdensity * dragkoefficient * area * vrel**2 # [cite: 45]
+        
+        forcex = -df * vrelx / vrel # [cite: 47]
+        forcey = -df * vrely / vrel
+        accx = forcex / ballmass
+        accy = forcey / ballmass + g
     else:
         forcex = -my * ballmass * abs(g) * xspeed
-        accx = forcex/ballmass
-
+        accx = forcex / ballmass
         forcey = k * (-ypos) + c * (-yspeed)
         accy = forcey / ballmass + g
-
     return [xspeed, yspeed, accx, accy]
 
-solution = i.solve_ivp(
-    fun=forcecalc,
-    t_span = [0,20],
-    y0=u0,
-    max_step=0.1
-)
-
-x_positions = solution.y[0]
-y_positions = solution.y[1]
-
 def ballstop(t, u):
-    xpos, ypos, xspeed, yspeed = u
-    # Returnerar 0 när xspeed är 0.01. Då triggas eventet.
-    return xspeed - 0.01 
-
-ballstop.terminal = True  # Avbryt simuleringen när detta händer
-ballstop.direction = -1   # Triggas när hastigheten minskar och passerar värdet
-
-anglelist = []
+    return u[2] - 0.01 
+ballstop.terminal = True
+ballstop.direction = -1
 
 def optimalangle():
-    for n in range(0,180):
+    best_dist = 0
+    best_sol = None
+    best_angle = 0
+    
+    for n in range(0, 181):
         angle = n / 2 
-        
         anglerad = math.radians(angle)
-        start_xspeed = math.cos(anglerad) * initialvelocity
-        start_yspeed = math.sin(anglerad) * initialvelocity
+        u0 = [0, 0, math.cos(anglerad)*initialvelocity, math.sin(anglerad)*initialvelocity]
 
-        current_u0 = [0, 0, start_xspeed, start_yspeed]
-
-        solution = i.solve_ivp(
+        sol = i.solve_ivp(
             fun=forcecalc,
-            t_span=[0, 20],
-            y0=current_u0,
+            t_span=[0, 25],
+            y0=u0,
             events=ballstop,
             max_step=0.1
         )
-
-        x_positions = solution.y[0]
-        final_x = x_positions[-1]
-
-        anglelist.append([final_x, angle])
+        
+        final_x = sol.y[0][-1]
+        if final_x > best_dist:
+            best_dist = final_x
+            best_sol = sol
+            best_angle = angle
     
-    best_result = max(anglelist)
+    print(f"Längsta slaget: {best_dist:.2f} m vid vinkeln {best_angle} grader")
+    return best_sol, best_angle
+
+best_sol, best_angle = optimalangle()
+
+if best_sol:
+    x_vals = best_sol.y[0]
+    y_vals = best_sol.y[1]
+    vx_vals = best_sol.y[2]
+    vy_vals = best_sol.y[3]
+
+
+
+    plt.figure(figsize=(10, 4))
+    plt.plot(x_vals, y_vals, label=f'Bästa slag ({best_angle}°)')
+    final_dist = best_sol.y[0][-1]
+
+    plt.text(0.05,0.05, f"Maximal räckvidd: {final_dist:.2f} m", 
+        transform=plt.gca().transAxes,
+        bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray'))
+    plt.title(f'Golfbollens bana - Optimal vinkel: {best_angle}°')
+    plt.xlabel('x (m)')
+    plt.ylabel('y (m)')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig("steg3-graf.png")
     
-    print(f"Längsta slaget: {best_result[0]:.2f} m vid vinkeln {best_result[1]} grader")
-
-optimalangle()
-
-plt.figure()
-plt.plot(x_positions, y_positions)
-plt.title('Golfbollens bana')
-plt.xlabel('Horisontellt avstånd (m)')
-plt.ylabel('Vertikal höjd (m)')
-plt.grid(True)
-plt.savefig("steg2-graf.png")
-plt.show()
+    plt.show()
