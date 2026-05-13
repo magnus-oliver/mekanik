@@ -84,8 +84,8 @@ def ballstop(t, u):
     xpos, ypos, xspeed, yspeed = u
     return xspeed - 0.01 
 
-ballstop.terminal = True  # Avbryt simuleringen när detta händer
-ballstop.direction = -1   # Triggas när hastigheten minskar och passerar värdet
+ballstop.terminal = True  
+ballstop.direction = -1  
 
 anglelist = []
 
@@ -154,7 +154,7 @@ if result:
     
     plt.figure(figsize=(10, 6))
     plt.plot(res_sol.y[0], res_sol.y[1], 'b-', label='Hole-in-one bana')
-    plt.plot(xhal, 0, 'gx', markersize=10, label='Hålet (190m)') # Grön cirkel för hålet
+    plt.plot(xhal, 0, 'gx', markersize=10, label='Hålet (190m)') 
     
     info_text = (
         f"--- Resultat ---\n"
@@ -176,26 +176,25 @@ if result:
     plt.savefig("steg4-graf.png")
     plt.show()
 else:
-    print("Ingen lösning hittades. Prova att öka intervallet för velocity_test.")
+    print("Ingen lösning hittad.")
 
 if result:
     res_sol = result['sol']
     
-    # 1. Hämta data för x-axeln och hastigheterna
-    x_vals = res_sol.y[0]
-    vx_vals = res_sol.y[2] # Index 2 är xspeed i din forcecalc
-    vy_vals = res_sol.y[3] # Index 3 är yspeed i din forcecalc
 
-    # 2. Skapa en ny figur för hastigheterna
+    x_vals = res_sol.y[0]
+    vx_vals = res_sol.y[2] 
+    vy_vals = res_sol.y[3] 
+
+
     plt.figure(figsize=(10, 5))
     plt.plot(x_vals, vx_vals, label='$v_x$ (Horisontell hastighet)', color='tab:blue')
     plt.plot(x_vals, vy_vals, label='$v_y$ (Vertikal hastighet)', color='tab:orange')
 
-    # 3. Formatering enligt instruktionerna
     plt.title('Hastighetslinjer')
     plt.xlabel('x (m)')
     plt.ylabel('Velocity (m/s)')
-    plt.axhline(0, color='black', linewidth=0.8, linestyle='--') # Linje vid noll för tydlighet
+    plt.axhline(0, color='black', linewidth=0.8, linestyle='--') 
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.6)
     
