@@ -5,7 +5,7 @@ import scipy.integrate as i
 
 g = -9.81
 ballmass = 46e-3
-windspeed = 0  
+windspeed = -100
 airdensity = 1.225
 dragkoefficient = 0.25
 area = 1430e-6
